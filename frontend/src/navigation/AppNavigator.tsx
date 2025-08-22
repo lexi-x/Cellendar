@@ -9,6 +9,8 @@ import {
 import { CompositeNavigationProp, RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { Culture } from '../types';
+import { useAuth } from '../contexts/AuthContext';
+import { ActivityIndicator, View } from 'react-native';
 
 // Import screens
 import { DashboardScreen } from '../screens/DashboardScreen';
@@ -19,10 +21,19 @@ import { CultureDetailScreen } from '../screens/CultureDetailScreen';
 import { TaskListScreen } from '../screens/TaskListScreen';
 import { AddTaskScreen } from '../screens/AddTaskScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
+import LoginScreen from '../screens/LoginScreen';
+import RegisterScreen from '../screens/RegisterScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 
 // Define the parameter lists
 
+type AuthStackParamList = {
+  Login: undefined;
+  Register: undefined;
+};
+
 type RootStackParamList = {
+  Auth: undefined;
   Main: undefined;
   AddTask: { cultureId: string };
 };
@@ -31,7 +42,7 @@ type MainTabsParamList = {
   Dashboard: undefined;
   Cultures: undefined;
   Tasks: undefined;
-  Settings: undefined;
+  Profile: undefined;
 };
 
 type CultureStackParamList = {
@@ -74,6 +85,7 @@ type AddTaskScreenProps = {
 
 const Tab = createBottomTabNavigator<MainTabsParamList>();
 const Stack = createStackNavigator<CultureStackParamList>();
+const AuthStack = createStackNavigator<AuthStackParamList>();
 const RootStack = createStackNavigator<RootStackParamList>();
 
 // Culture Stack Navigator
@@ -126,8 +138,8 @@ const TabNavigator = () => {
             iconName = focused ? 'flask' : 'flask-outline';
           } else if (route.name === 'Tasks') {
             iconName = focused ? 'checkmark-done' : 'checkmark-done-outline';
-          } else if (route.name === 'Settings') {
-            iconName = focused ? 'settings' : 'settings-outline';
+          } else if (route.name === 'Profile') {
+            iconName = focused ? 'person' : 'person-outline';
           } else {
             iconName = 'help-outline';
           }
@@ -154,24 +166,50 @@ const TabNavigator = () => {
       <Tab.Screen name="Dashboard" component={DashboardScreen} />
       <Tab.Screen name="Cultures" component={CultureStackNavigator} />
       <Tab.Screen name="Tasks" component={TaskListScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );
 };
 
-// Root Stack Navigator
+// Auth Stack Navigator
+const AuthStackNavigator = () => {
+  return (
+    <AuthStack.Navigator screenOptions={{ headerShown: false }}>
+      <AuthStack.Screen name="Login" component={LoginScreen} />
+      <AuthStack.Screen name="Register" component={RegisterScreen} />
+    </AuthStack.Navigator>
+  );
+};
+
+// Root Stack Navigator with Auth Check
 export const AppNavigator = () => {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
   return (
     <RootStack.Navigator screenOptions={{ headerShown: false }}>
-      <RootStack.Screen name="Main" component={TabNavigator} />
-      <RootStack.Screen 
-        name="AddTask" 
-        component={AddTaskScreen as React.ComponentType}
-        options={({ route }) => ({ 
-          title: 'Add Task',
-          headerShown: true 
-        })}
-      />
+      {isAuthenticated ? (
+        <>
+          <RootStack.Screen name="Main" component={TabNavigator} />
+          <RootStack.Screen 
+            name="AddTask" 
+            component={AddTaskScreen as React.ComponentType}
+            options={({ route }) => ({ 
+              title: 'Add Task',
+              headerShown: true 
+            })}
+          />
+        </>
+      ) : (
+        <RootStack.Screen name="Auth" component={AuthStackNavigator} />
+      )}
     </RootStack.Navigator>
   );
 };
