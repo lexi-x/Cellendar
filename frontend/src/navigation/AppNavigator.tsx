@@ -24,6 +24,7 @@ import { SettingsScreen } from '../screens/SettingsScreen';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import { List } from 'react-native-paper';
 
 // Define the parameter lists
 
@@ -52,6 +53,10 @@ type CultureStackParamList = {
   CultureDetail: { cultureId: string };
   AddTask: { cultureId: string };
 };
+
+type TaskStackParamList = {
+  TaskList: undefined;
+}
 
 // Navigation prop types
 type CultureStackNavigationProp<T extends keyof CultureStackParamList> = {
@@ -83,8 +88,15 @@ type AddTaskScreenProps = {
   route: RouteProp<CultureStackParamList, 'AddTask'>;
 };
 
+type TaskListScreenProps = {
+  navigation: StackNavigationProp<TaskStackParamList, 'TaskList'>;
+  route: RouteProp<TaskStackParamList, 'TaskList'>;
+};
+
+
 const Tab = createBottomTabNavigator<MainTabsParamList>();
 const Stack = createStackNavigator<CultureStackParamList>();
+const TaskStack = createStackNavigator<TaskStackParamList>();
 const AuthStack = createStackNavigator<AuthStackParamList>();
 const RootStack = createStackNavigator<RootStackParamList>();
 
@@ -120,7 +132,26 @@ const CultureStackNavigator = () => {
         component={AddTaskScreen as React.ComponentType}
         options={{ title: 'Add New Task' }}
       />
+
+      <Stack.Screen 
+        name="TaskList" 
+        component={TaskListScreen as React.ComponentType}
+        options={{ title: 'Get Task List' }}
+      />
     </Stack.Navigator>
+  );
+};
+
+// Task List Navigator
+const TaskStackNavigator = () => {
+  return (
+    <TaskStack.Navigator screenOptions={{ headerShown: false }}>
+      <TaskStack.Screen 
+        name="TaskList" 
+        component={TaskListScreen as React.ComponentType}
+        options={{ title: 'Access Task LIst' }}
+      />
+      </TaskStack.Navigator>
   );
 };
 
@@ -165,7 +196,7 @@ const TabNavigator = () => {
     >
       <Tab.Screen name="Dashboard" component={DashboardScreen} />
       <Tab.Screen name="Cultures" component={CultureStackNavigator} />
-      <Tab.Screen name="Tasks" component={TaskListScreen} />
+      <Tab.Screen name="Tasks" component={TaskStackNavigator} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );

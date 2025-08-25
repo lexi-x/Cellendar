@@ -50,6 +50,7 @@ export const AddCultureScreen: React.FC<Props> = ({ navigation }) => {
         lastActionDate: startDate,
         notes: notes.trim(),
         status: 'active',
+        repeatableNotifications: [],
         createdAt: new Date(),
         updatedAt: new Date(),
       };
