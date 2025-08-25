@@ -5,10 +5,10 @@ import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 
 // Import routes
-import authRoutes from './routes/auth';
-import cultureRoutes from './routes/cultures';
-import taskRoutes from './routes/tasks';
-import notificationRoutes from './routes/notifications';
+import authRoutes from './routes/authRoutes';
+// import cultureRoutes from './routes/cultures';
+// import taskRoutes from './routes/tasks';
+// import notificationRoutes from './routes/notifications';
 
 // Import middleware
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
@@ -57,9 +57,9 @@ app.get('/health', (req, res) => {
 
 // API routes
 app.use('/api/auth', authRoutes);
-app.use('/api/cultures', cultureRoutes);
-app.use('/api/tasks', taskRoutes);
-app.use('/api/notifications', notificationRoutes);
+// app.use('/api/cultures', cultureRoutes);
+// app.use('/api/tasks', taskRoutes);
+// app.use('/api/notifications', notificationRoutes);
 
 // 404 handler
 app.use(notFoundHandler);
