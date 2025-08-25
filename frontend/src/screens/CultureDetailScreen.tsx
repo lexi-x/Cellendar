@@ -10,7 +10,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { Culture, Task } from '../types';
-import { StorageService } from '../services/storage';
+import { ApiService } from '../services/api';
 
 interface Props {
   navigation: any;
@@ -28,8 +28,8 @@ export const CultureDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   const loadData = async () => {
     try {
       const [cultures, allTasks] = await Promise.all([
-        StorageService.getCultures(),
-        StorageService.getTasks(),
+        ApiService.getCultures(),
+        ApiService.getTasks(),
       ]);
       
       const updatedCulture = cultures.find(c => c.id === culture.id);

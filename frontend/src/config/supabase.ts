@@ -1,7 +1,16 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://vmgitjcfgyhbkqiqkppi.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtZ2l0amNmZ3loYmtxaXFrcHBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU4Nzg4MzcsImV4cCI6MjA3MTQ1NDgzN30.yMtxtrhuwkej-sG3zN6yECaYZMJgFxN5iHN3dh97YRk';
+// Prefer Expo public env vars, fallback to plain names if provided
+const supabaseUrl =
+  process.env.EXPO_PUBLIC_SUPABASE_URL || (process.env.SUPABASE_URL as string);
+const supabaseAnonKey =
+  process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || (process.env.SUPABASE_ANON_KEY as string);
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error(
+    'Missing Supabase env vars. Set EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY in frontend/.env'
+  );
+}
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {

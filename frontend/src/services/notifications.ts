@@ -1,6 +1,6 @@
 import * as Notifications from 'expo-notifications';
 import { Task, NotificationSettings } from '../types';
-import { StorageService } from './storage';
+import { ApiService } from './api';
 
 // Configure notification behavior
 Notifications.setNotificationHandler({
@@ -28,7 +28,7 @@ export class NotificationService {
 
   static async scheduleTaskReminder(task: Task): Promise<string | null> {
     try {
-      const settings = await StorageService.getNotificationSettings();
+      const settings = await ApiService.getNotificationSettings();
       if (!settings.enabled) return null;
 
       const reminderTime = new Date(task.scheduledDate);
@@ -58,7 +58,7 @@ export class NotificationService {
 
   static async scheduleOverdueAlert(task: Task): Promise<string | null> {
     try {
-      const settings = await StorageService.getNotificationSettings();
+      const settings = await ApiService.getNotificationSettings();
       if (!settings.enabled || !settings.overdueAlerts) return null;
 
       // Schedule overdue alert 1 hour after due time
@@ -105,7 +105,7 @@ export class NotificationService {
       await Notifications.cancelAllScheduledNotificationsAsync();
 
       // Get all incomplete tasks and reschedule
-      const tasks = await StorageService.getTasks();
+      const tasks = await ApiService.getTasks();
       const incompleteTasks = tasks.filter(task => !task.isCompleted);
 
       for (const task of incompleteTasks) {
@@ -119,7 +119,7 @@ export class NotificationService {
 
   static async getDailyTaskSummary(): Promise<void> {
     try {
-      const tasks = await StorageService.getTasks();
+      const tasks = await ApiService.getTasks();
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const tomorrow = new Date(today);

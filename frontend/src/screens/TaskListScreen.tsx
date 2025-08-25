@@ -11,7 +11,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { Task, Culture } from '../types';
-import { StorageService } from '../services/storage';
+import { ApiService } from '../services/api';
 import { NotificationService } from '../services/notifications';
 
 interface Props {
@@ -28,8 +28,8 @@ export const TaskListScreen: React.FC<Props> = ({ navigation }) => {
   const loadData = async () => {
     try {
       const [loadedTasks, loadedCultures] = await Promise.all([
-        StorageService.getTasks(),
-        StorageService.getCultures(),
+        ApiService.getTasks(),
+        ApiService.getCultures(),
       ]);
       setTasks(loadedTasks);
       setCultures(loadedCultures);
@@ -55,7 +55,7 @@ export const TaskListScreen: React.FC<Props> = ({ navigation }) => {
 
   const handleCompleteTask = async (task: Task) => {
     try {
-      await StorageService.completeTask(task.id);
+      await ApiService.completeTask(task.id);
       await NotificationService.cancelTaskNotifications(task.id);
       
       // If it's a passaging task, increment the culture's passage number
@@ -68,7 +68,7 @@ export const TaskListScreen: React.FC<Props> = ({ navigation }) => {
             lastActionDate: new Date(),
             updatedAt: new Date(),
           };
-          await StorageService.updateCulture(updatedCulture);
+          await ApiService.updateCulture(updatedCulture);
         }
       }
       
@@ -89,7 +89,7 @@ export const TaskListScreen: React.FC<Props> = ({ navigation }) => {
           style: 'destructive',
           onPress: async () => {
             try {
-              await StorageService.deleteTask(task.id);
+              await ApiService.deleteTask(task.id);
               await NotificationService.cancelTaskNotifications(task.id);
               await loadData();
             } catch (error) {

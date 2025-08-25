@@ -6,13 +6,9 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
-  Share,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import * as FileSystem from 'expo-file-system';
-import * as DocumentPicker from 'expo-document-picker';
-import { DocumentPickerResult } from 'expo-document-picker';
-import { StorageService } from '../services/storage';
+import { ApiService } from '../services/api';
 import { NotificationService } from '../services/notifications';
 
 interface Props {
@@ -32,93 +28,13 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
 
   const loadSettings = async () => {
     try {
-      const settings = await StorageService.getNotificationSettings();
+      const settings = await ApiService.getNotificationSettings();
       setNotificationSettings(settings);
     } catch (error) {
       console.error('Error loading settings:', error);
     }
   };
 
-  const handleExportData = async () => {
-    try {
-      const data = await StorageService.exportData();
-      const jsonString = JSON.stringify(data, null, 2);
-      const fileName = `cellendar_backup_${new Date().toISOString().split('T')[0]}.json`;
-      const fileUri = FileSystem.documentDirectory + fileName;
-
-      await FileSystem.writeAsStringAsync(fileUri, jsonString);
-
-      await Share.share({
-        url: fileUri,
-        title: 'Export Cellendar Data',
-      });
-
-      Alert.alert('Success', 'Data exported successfully!');
-    } catch (error) {
-      console.error('Error exporting data:', error);
-      Alert.alert('Error', 'Failed to export data');
-    }
-  };
-
-  const handleImportData = async () => {
-    try {
-      const result = await DocumentPicker.getDocumentAsync({
-        type: 'application/json',
-        copyToCacheDirectory: true,
-      });
-
-      if (result.canceled === false && result.assets && result.assets.length > 0) {
-        const content = await FileSystem.readAsStringAsync(result.assets[0].uri);
-        const data = JSON.parse(content);
-
-        Alert.alert(
-          'Import Data',
-          'This will replace all existing data. Are you sure?',
-          [
-            { text: 'Cancel', style: 'cancel' },
-            {
-              text: 'Import',
-              style: 'destructive',
-              onPress: async () => {
-                try {
-                  await StorageService.importData(data);
-                  await NotificationService.rescheduleAllTaskNotifications();
-                  Alert.alert('Success', 'Data imported successfully!');
-                } catch (error) {
-                  Alert.alert('Error', 'Failed to import data. Please check the file format.');
-                }
-              },
-            },
-          ]
-        );
-      }
-    } catch (error) {
-      console.error('Error importing data:', error);
-      Alert.alert('Error', 'Failed to import data');
-    }
-  };
-
-  const handleClearAllData = () => {
-    Alert.alert(
-      'Clear All Data',
-      'This will permanently delete all cultures, tasks, and settings. This action cannot be undone.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete All',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await StorageService.clearAllData();
-              Alert.alert('Success', 'All data has been cleared');
-            } catch (error) {
-              Alert.alert('Error', 'Failed to clear data');
-            }
-          },
-        },
-      ]
-    );
-  };
 
   const toggleNotifications = async () => {
     const newSettings = {
@@ -127,7 +43,7 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
     };
     
     try {
-      await StorageService.saveNotificationSettings(newSettings);
+      await ApiService.saveNotificationSettings(newSettings);
       setNotificationSettings(newSettings);
       
       if (newSettings.enabled) {
@@ -148,7 +64,7 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
     };
     
     try {
-      await StorageService.saveNotificationSettings(newSettings);
+      await ApiService.saveNotificationSettings(newSettings);
       setNotificationSettings(newSettings);
       await NotificationService.rescheduleAllTaskNotifications();
     } catch (error) {
@@ -213,49 +129,6 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Data Management Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Data Management</Text>
-        
-        <TouchableOpacity style={styles.settingItem} onPress={handleExportData}>
-          <View style={styles.settingInfo}>
-            <Ionicons name="download-outline" size={24} color="#2196F3" />
-            <View style={styles.settingText}>
-              <Text style={styles.settingLabel}>Export Data</Text>
-              <Text style={styles.settingDescription}>
-                Backup all cultures and tasks to a file
-              </Text>
-            </View>
-          </View>
-          <Ionicons name="chevron-forward" size={20} color="#ccc" />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.settingItem} onPress={handleImportData}>
-          <View style={styles.settingInfo}>
-            <Ionicons name="cloud-upload-outline" size={24} color="#2196F3" />
-            <View style={styles.settingText}>
-              <Text style={styles.settingLabel}>Import Data</Text>
-              <Text style={styles.settingDescription}>
-                Restore from a backup file
-              </Text>
-            </View>
-          </View>
-          <Ionicons name="chevron-forward" size={20} color="#ccc" />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.settingItem} onPress={handleClearAllData}>
-          <View style={styles.settingInfo}>
-            <Ionicons name="trash-outline" size={24} color="#F44336" />
-            <View style={styles.settingText}>
-              <Text style={[styles.settingLabel, { color: '#F44336' }]}>Clear All Data</Text>
-              <Text style={styles.settingDescription}>
-                Permanently delete all data
-              </Text>
-            </View>
-          </View>
-          <Ionicons name="chevron-forward" size={20} color="#ccc" />
-        </TouchableOpacity>
-      </View>
 
       {/* About Section */}
       <View style={styles.section}>

@@ -13,7 +13,7 @@ import {
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import { Culture, Task, TaskType } from '../types';
-import { StorageService } from '../services/storage';
+import { ApiService } from '../services/api';
 import { NotificationService } from '../services/notifications';
 
 interface Props {
@@ -97,7 +97,7 @@ export const AddTaskScreen: React.FC<Props> = ({ navigation, route }) => {
         updatedAt: new Date(),
       };
 
-      await StorageService.addTask(newTask);
+      await ApiService.addTask(newTask);
       
       // Schedule notifications
       await NotificationService.scheduleTaskReminder(newTask);

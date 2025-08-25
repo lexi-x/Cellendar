@@ -11,7 +11,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { Culture } from '../types';
-import { StorageService } from '../services/storage';
+import { ApiService } from '../services/api';
 
 interface Props {
   navigation: any;
@@ -24,7 +24,7 @@ export const CultureListScreen: React.FC<Props> = ({ navigation }) => {
 
   const loadCultures = async () => {
     try {
-      const loadedCultures = await StorageService.getCultures();
+      const loadedCultures = await ApiService.getCultures();
       setCultures(loadedCultures);
     } catch (error) {
       console.error('Error loading cultures:', error);
@@ -57,7 +57,7 @@ export const CultureListScreen: React.FC<Props> = ({ navigation }) => {
           style: 'destructive',
           onPress: async () => {
             try {
-              await StorageService.deleteCulture(culture.id);
+              await ApiService.deleteCulture(culture.id);
               await loadCultures();
             } catch (error) {
               Alert.alert('Error', 'Failed to delete culture');

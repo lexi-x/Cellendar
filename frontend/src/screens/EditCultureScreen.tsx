@@ -13,7 +13,7 @@ import {
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import { Culture, CultureStatus } from '../types';
-import { StorageService } from '../services/storage';
+import { ApiService } from '../services/api';
 
 interface Props {
   navigation: any;
@@ -67,7 +67,7 @@ export const EditCultureScreen: React.FC<Props> = ({ navigation, route }) => {
         updatedAt: new Date(),
       };
 
-      await StorageService.updateCulture(updatedCulture);
+      await ApiService.updateCulture(updatedCulture);
       navigation.goBack();
     } catch (error) {
       Alert.alert('Error', 'Failed to update culture');

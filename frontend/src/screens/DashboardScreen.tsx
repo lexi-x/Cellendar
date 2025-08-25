@@ -11,7 +11,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { Culture, Task } from '../types';
-import { StorageService } from '../services/storage';
+import { ApiService } from '../services/api';
 
 interface Props {
   navigation: any;
@@ -26,8 +26,8 @@ export const DashboardScreen: React.FC<Props> = ({ navigation }) => {
   const loadData = async () => {
     try {
       const [loadedCultures, loadedTasks] = await Promise.all([
-        StorageService.getCultures(),
-        StorageService.getTasks(),
+        ApiService.getCultures(),
+        ApiService.getTasks(),
       ]);
       setCultures(loadedCultures);
       setTasks(loadedTasks);
@@ -70,7 +70,7 @@ export const DashboardScreen: React.FC<Props> = ({ navigation }) => {
 
   const handleCompleteTask = async (task: Task) => {
     try {
-      await StorageService.completeTask(task.id);
+      await ApiService.completeTask(task.id);
       
       // If it's a passaging task, increment the culture's passage number
       if (task.type === 'passaging') {
@@ -82,7 +82,7 @@ export const DashboardScreen: React.FC<Props> = ({ navigation }) => {
             lastActionDate: new Date(),
             updatedAt: new Date(),
           };
-          await StorageService.updateCulture(updatedCulture);
+          await ApiService.updateCulture(updatedCulture);
         }
       }
       
